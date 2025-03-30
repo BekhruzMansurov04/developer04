@@ -2,11 +2,13 @@ import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { FaSignOutAlt, FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-gray-800 text-white p-4 shadow-md">
@@ -45,7 +47,10 @@ const Header = () => {
                 Posts
               </Link>
               <button 
-                onClick={logout} 
+                onClick={() => {
+                  logout();
+                  navigate("/login");
+                }}
                 className="flex items-center gap-2  hover:text-teal-300 transition"
               >
                 <FaSignOutAlt /> Logout

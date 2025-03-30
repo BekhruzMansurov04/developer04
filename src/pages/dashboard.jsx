@@ -1,21 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import GetDataApi from "../hooks/GetDataApi";
+import { FaUser } from "react-icons/fa";
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    } else {
-      setLoading(false);
-    }
-  }, [user, navigate]);
+  const { data: profile, loading: profileLoading, error } = GetDataApi("/profile/auth");
 
-  if (loading) {
+  if (profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 text-gray-900">
         <p className="text-lg">Loading user data...</p>
@@ -24,18 +18,26 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-900">
-      <h1 className="text-3xl font-bold">Welcome, {user?.name}!</h1>
-      <p className="text-lg mt-2">Email: {user?.email}</p>
-      <button
-        className="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-        onClick={() => {
-          logout();
-          navigate("/login");
-        }}
-      >
-        Logout
-      </button>
+    <div className="max-w-3xl mx-auto py-10 px-6 bg-white shadow-md rounded-lg mt-10">
+      <h1 className="text-4xl font-bold text-teal-600">Dashboard</h1>
+
+      <div className="flex items-center mt-4">
+        <FaUser className="text-xl text-gray-600 mr-2" />
+        <h2 className="text-xl font-semibold">Welcome {user?.name}</h2>
+      </div>
+
+      <p className="text-gray-700 mt-2">
+        {profile ? "Your profile is set up! Please add some info about yourself" : "You have not yet set up a profile, please add some info"}
+      </p>
+
+      {(
+        <Link
+          to="/createProfile"
+          className="mt-4 inline-block bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-md transition"
+        >
+          Create Profile
+        </Link>
+      )}
     </div>
   );
 };

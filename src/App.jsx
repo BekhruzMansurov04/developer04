@@ -11,6 +11,7 @@ import Dashboard from "./pages/dashboard";
 import Profile from "./pages/profile"; 
 import ProfileDetails from "./pages/profileDetails"; 
 import PostDetails from "./pages/postDetails";
+import CreateProfile from "./pages/createProfile";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/posts" element={<Posts />} />
+                    <Route path="/createProfile" element={<CreateProfile />} />
                   </Routes>
           </AuthProvider>
         </LanguageProvider>

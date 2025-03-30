@@ -4,41 +4,40 @@ import axios from "axios";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [user, setUser] = useState(() => {
     try {
-      const storedUser = localStorage.getItem("user");
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch (error) {
-      console.error("Error parsing user data:", error);
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
       return null;
     }
   });
 
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axios.defaults.headers.common["x-auth-token"] = token;
       fetchUser();
     } else {
-      delete axios.defaults.headers.common["Authorization"];
+      delete axios.defaults.headers.common["x-auth-token"];
     }
   }, [token]);
 
   const fetchUser = async () => {
+    if (!token) return;
+
     try {
-      const res = await axios.get("https://nt-devconnector.onrender.com/api/auth/me");
+      const res = await axios.get("https://nt-devconnector.onrender.com/api/auth");
       setUser(res.data);
       localStorage.setItem("user", JSON.stringify(res.data));
     } catch (err) {
-      console.error("Failed to fetch user data:", err);
-      logout(); 
+      console.error("Failed to fetch user:", err);
+      logout();
     }
   };
 
-  const login = async (token) => {
-    localStorage.setItem("token", token);
-    setToken(token);
-    await fetchUser(); 
+  const login = async (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
   };
 
   const logout = () => {
@@ -46,11 +45,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
-    delete axios.defaults.headers.common["Authorization"];
+    delete axios.defaults.headers.common["x-auth-token"];
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, token, login, logout }}> 
       {children}
     </AuthContext.Provider>
   );
